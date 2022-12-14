@@ -386,6 +386,114 @@ def sun_earth_jupiter_attraction():
 
     plt.show()
 
+
+def sun_earth_jupiter_adaptive():
+    fig, axs = plt.subplots(1, 3, sharex=True, sharey=True)
+    fig.set_figwidth(15)
+    fig.set_figheight(6)
+
+    data = pd.read_csv(os.path.join('results', 'sun_earth_jupiter_adaptive_1.csv'),
+            delimiter=";", header=0, index_col='Time')
+    axs[0].plot(data['a x'], data['a y'], color = 'orange')
+    axs[0].plot(data['b x'], data['b y'], color = 'green')
+    axs[0].plot(data['c x'], data['c y'], color = 'red')
+
+    axs[0].set_xlabel('$x$ [au]', fontsize=18)
+    axs[0].set_ylabel('$y$ [au]', fontsize=18)
+    axs[0].set_title('$M_J$', x=0.2)
+
+    data = pd.read_csv(os.path.join('results', 'sun_earth_jupiter_adaptive_10.csv'),
+            delimiter=";", header=0, index_col='Time')
+    axs[1].plot(data['a x'], data['a y'], color = 'orange')
+    axs[1].plot(data['b x'], data['b y'], color = 'green')
+    axs[1].plot(data['c x'], data['c y'], color = 'red')
+
+    axs[1].set_xlabel('$x$ [au]', fontsize=18)
+    # axs[1].set_ylabel('$y$ [au]', fontsize=18)
+    axs[1].set_title('$10 M_J$', x=0.2)
+
+    data = pd.read_csv(os.path.join('results', 'sun_earth_jupiter_adaptive_100.csv'),
+            delimiter=";", header=0, index_col='Time')
+    axs[2].plot(data['a x'], data['a y'], color = 'orange')
+    axs[2].plot(data['b x'], data['b y'], color = 'green')
+    axs[2].plot(data['c x'], data['c y'], color = 'red')
+
+    axs[2].set_xlabel('$x$ [au]', fontsize=18)
+    # axs[2].set_ylabel('$y$ [au]', fontsize=18)
+    axs[2].set_title('$100 M_J$', x=0.2)
+    
+    plt.show()
+    
+    fig, axs = plt.subplots(1, 1, sharex=True, sharey=True)
+    fig.set_figwidth(8)
+    fig.set_figheight(8)
+
+    data = pd.read_csv(os.path.join('results', 'sun_earth_jupiter_adaptive_1000.csv'),
+            delimiter=";", header=0, index_col='Time')
+    axs.plot(data['a x'], data['a y'], color = 'orange')
+    axs.plot(data['b x'], data['b y'], color = 'green')
+    axs.plot(data['c x'], data['c y'], color = 'red')
+
+    axs.set_xlabel('$x$ [au]', fontsize=18)
+    axs.set_ylabel('$y$ [au]', fontsize=18)
+    axs.set_title('$1000 M_J$', x=0.2)
+
+    plt.show()
+
+def sun_earth_jupiter_adaptive_relative():
+    fig, axs = plt.subplots(1, 3, sharex=True, sharey=True)
+    fig.set_figwidth(18)
+    fig.set_figheight(5)
+
+    data = pd.read_csv(os.path.join('results', 'sun_earth_jupiter_adaptive_1.csv'),
+            delimiter=";", header=0, index_col='Time')
+    axs[0].scatter([0], [0], marker='*', color='orange')
+    axs[0].plot(data['b x'] - data['a x'], data['b y'] - data['a y'], color = 'green')
+    axs[0].plot(data['c x'] - data['a x'], data['c y'] - data['a y'], color = 'red')
+    
+    axs[0].set_xlabel('$x$ [au]', fontsize=18)
+    axs[0].set_ylabel('$y$ [au]', fontsize=18)
+    axs[0].set_title('$M_J$', x=0.2)
+
+    data = pd.read_csv(os.path.join('results', 'sun_earth_jupiter_adaptive_10.csv'),
+            delimiter=";", header=0, index_col='Time')
+    axs[1].scatter([0], [0], marker='*', color='orange')
+    axs[1].plot(data['b x'] - data['a x'], data['b y'] - data['a y'], color = 'green')
+    axs[1].plot(data['c x'] - data['a x'], data['c y'] - data['a y'], color = 'red')
+
+    axs[1].set_xlabel('$x$ [au]', fontsize=18)
+    # axs[1].set_ylabel('$y$ [au]', fontsize=18)
+    axs[1].set_title('$10 M_J$', x=0.2)
+    
+
+    data = pd.read_csv(os.path.join('results', 'sun_earth_jupiter_adaptive_100.csv'),
+            delimiter=";", header=0, index_col='Time')
+    axs[2].scatter([0], [0], marker='*', color='orange')
+    axs[2].plot(data['b x'] - data['a x'], data['b y'] - data['a y'], color = 'green')
+    axs[2].plot(data['c x'] - data['a x'], data['c y'] - data['a y'], color = 'red')
+
+    axs[2].set_xlabel('$x$ [au]', fontsize=18)
+    # axs[2].set_ylabel('$y$ [au]', fontsize=18)
+    axs[2].set_title('$100 M_J$', x=0.2)
+    
+    plt.show()
+
+    fig, axs = plt.subplots(1, 1, sharex=True, sharey=True)
+    fig.set_figwidth(16)
+    fig.set_figheight(8)
+
+    data = pd.read_csv(os.path.join('results', 'sun_earth_jupiter_adaptive_1000.csv'),
+            delimiter=";", header=0, index_col='Time')
+    axs.scatter([0], [0], marker='*', color='orange')
+    axs.plot(data['b x'] - data['a x'], data['b y'] - data['a y'], color = 'green')
+    axs.plot(data['c x'] - data['a x'], data['c y'] - data['a y'], color = 'red')
+
+    axs.set_xlabel('$x$ [au]', fontsize=18)
+    axs.set_ylabel('$y$ [au]', fontsize=18)
+    axs.set_title('$1000 M_J$', x=0.2)
+
+    plt.show()
+
 def dual_convergence_x():
     fig, ax = plt.subplots(1, 1, sharex=True, sharey=True)
     fig.set_figwidth(8)
@@ -394,23 +502,13 @@ def dual_convergence_x():
     data = pd.read_csv(os.path.join('results', 'convergence.csv'),
             delimiter=";", header=0)
 
-    ax.plot(data["dt"][2:], data['error x'][2:], color='red')
-    ax.set_ylabel("$x_{err}$ [m]")
+    ax.plot(data["dt"], data['error x'], color='red')
+    ax.scatter(data["dt"], data['error x'], color='red')
+    ax.set_ylabel("Error on $x$ [m]")
     ax.set_xlabel("Timestep [$\\tau$]")
-
-    plt.show()
-
-def dual_convergence_r():
-    fig, ax = plt.subplots(1, 1, sharex=True, sharey=True)
-    fig.set_figwidth(8)
-    fig.set_figheight(8)
-
-    data = pd.read_csv(os.path.join('results', 'convergence.csv'),
-            delimiter=";", header=0)
-
-    ax.plot(data["dt"][2:], data['error r'][2:], color='red')
-    ax.set_ylabel("$|r|^2_{err}$ [m$^2$]")
-    ax.set_xlabel("Timestep [$\\tau$]")
+    
+    ax.set_yscale('log')
+    ax.set_xscale('log')
 
     plt.show()
 
@@ -436,7 +534,6 @@ def main():
         dual_diff(4)
     elif args.mode == 'dual_conv':
         dual_convergence_x()
-        dual_convergence_r()
     elif args.mode == 'sej':
         plt.rcParams['axes.titley'] = 0.9
         sun_earth_jupiter()
@@ -450,6 +547,10 @@ def main():
         sun_earth_jupiter_special()
         sun_earth_jupiter_special_relative()
         sun_earth_jupiter_special_diff()
+    elif args.mode == 'sej_adaptive':
+        plt.rcParams['axes.titley'] = 0.9
+        sun_earth_jupiter_adaptive()
+        sun_earth_jupiter_adaptive_relative()
 
 
 if __name__ == '__main__':

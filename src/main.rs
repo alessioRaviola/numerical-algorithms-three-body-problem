@@ -1,22 +1,8 @@
 use std::{fs, f64::consts::PI};
 
-struct Body {
-    x: f64,
-    y: f64,
-    vx: f64,
-    vy: f64,
-    mass: f64,
-}
+mod body;
+use body::{Body, build_body};
 
-fn build_body(x: f64, y: f64, vx: f64, vy: f64, mass: f64) -> Body {
-    Body {
-        x,
-        y,
-        vx,
-        vy,
-        mass,
-    }
-}
 
 static mut G_GC: f64 = 1.0;
 
@@ -221,10 +207,10 @@ fn test_dual_system(v: f64, dt: f64, indexfile: i32, nsteps: i32) {
     fs::write(format!("results/test_dual_{}.csv", indexfile), data).expect("Impossible to write to file!");
 }
 
-fn convergence_dual_system(nsteps: i32, periods: i32) -> (f64, f64) {
-    let a: Body = build_body(-0.25, 0.0, 0.0, 1.0, 1.0);
-    let b: Body = build_body(0.25, 0.0, 0.0, -1.0, 1.0);
-    let dt: f64 = periods as f64 * PI * 0.5 / nsteps as f64;
+fn convergence_dual_system(nsteps: i32) -> f64 {
+    let a: Body = build_body(1.0, 0.0, 0.0, -1.0, 0.0);
+    let b: Body = build_body(0.0, 0.0, 0.0, 0.0, 1.0);
+    let dt: f64 = 0.5 * PI / nsteps as f64;
 
 
     let mut bodies = [a, b];
@@ -232,16 +218,15 @@ fn convergence_dual_system(nsteps: i32, periods: i32) -> (f64, f64) {
     let mut ay = [0.0; 2];
     newton_gravity_acceleration(&bodies, &mut ax, &mut ay);
 
-    for _ in 0..nsteps {
+    for _i in 0..nsteps {
         verlet_velocity_bodies(
             &mut bodies, newton_gravity_acceleration, &mut ax, &mut ay, dt
         );
     }
 
-    let error_r = bodies[0].x * bodies[0].x + bodies[0].y * bodies[0].y - 0.0625;
-    let error_x = bodies[0].x + 0.25;
+    let error_x = (bodies[0].x).abs();
 
-    return (error_x, error_r);
+    return error_x;
 }
 
 fn three_body_problem(b1: Body, b2: Body, b3: Body, dt: f64, nsteps: i32, filename: &str) {
@@ -320,10 +305,46 @@ fn three_body_problem_special(b1: Body, b2: Body, b3: Body, dt: f64, nsteps: i32
     fs::write(format!("results/{}.csv", filename), data).expect("Impossible to write to file!");
 }
 
+mod adaptive_timestep;
+use adaptive_timestep::three_body_problem_adaptive;
+
 fn main() {
 
-    let skip_sej = true;
+    let skip_sej = false;
     let skipt_tests = false;
+    let skip_adaptive = false;
+
+    if !skip_adaptive {
+
+        unsafe { G_GC = 1.184e-4; }
+        // Sun - Earth - Jupiter system (Initial time step: 0.00001 years)
+        let start_dt = 0.00001;
+        // Integration untile time = 50 years
+        let max_time = 50.0;
+
+        let sun: Body = build_body(0.0, 0.0, 0.0, 0.0, 3.33e5);
+        let earth: Body = build_body(1.017, 0.0, 0.0, 6.174, 1.0);
+        let jupiter: Body = build_body(5.457, 0.0, 0.0, 2.622, 3.178e2);
+        three_body_problem_adaptive(sun, earth, jupiter, start_dt, max_time, &"sun_earth_jupiter_adaptive_1");
+
+        let sun: Body = build_body(0.0, 0.0, 0.0, 0.0, 3.33e5);
+        let earth: Body = build_body(1.017, 0.0, 0.0, 6.174, 1.0);
+        let jupiter_10: Body = build_body(5.457, 0.0, 0.0, 2.622, 3.178e2 * 10.0);
+        three_body_problem_adaptive(sun, earth, jupiter_10, start_dt, max_time, &"sun_earth_jupiter_adaptive_10");
+
+        let sun: Body = build_body(0.0, 0.0, 0.0, 0.0, 3.33e5);
+        let earth: Body = build_body(1.017, 0.0, 0.0, 6.174, 1.0);
+        let jupiter_100: Body = build_body(5.457, 0.0, 0.0, 2.622, 3.178e2 * 100.0);
+        three_body_problem_adaptive(sun, earth, jupiter_100, start_dt, max_time, &"sun_earth_jupiter_adaptive_100");
+
+        let sun: Body = build_body(0.0, 0.0, 0.0, 0.0, 3.33e5);
+        let earth: Body = build_body(1.017, 0.0, 0.0, 6.174, 1.0);
+        let jupiter_1000: Body = build_body(5.457, 0.0, 0.0, 2.622, 3.178e2 * 1000.0);
+        three_body_problem_adaptive(sun, earth, jupiter_1000, start_dt, max_time, &"sun_earth_jupiter_adaptive_1000");
+
+        println!("SEJ Adaptive - Done");
+
+    }
 
     if !skipt_tests {
 
@@ -339,17 +360,19 @@ fn main() {
         println!("Dual system diff - Done");
 
         // Data to plot accuracy over size of timestep (convergence)
-        let npoints = 2000;
-        let periods: i32 = 10;
-        let step_mult = 10;
-        let start: i32 = 200;
-        let mut data: String = "dt;error x;error r\n".to_owned();
+        let npoints = 15;
+        let step_exp = 4;
+        let start: i32 = 10;
+        let mut data: String = "steps;dt;error x\n".to_owned();
 
-        for i in 0..(npoints) {
-            let (error_x, error_r): (f64, f64) = convergence_dual_system(start + step_mult * i, periods);
+        for i in 1..(npoints + 1) {
+            let nsteps: i32 = start + (i as i32).pow(step_exp);
+            let error_x = convergence_dual_system(nsteps);
             data.push_str(&format!("{};{};{}\n",
-                periods as f64 * PI * 0.5 / (start + step_mult * i) as f64,
-                error_x, error_r));
+                nsteps,
+                PI * 0.5 / nsteps as f64,
+                error_x
+            ));
             println!("Dual system convergence - {} / {}", i, npoints);
         }
         fs::write(format!("results/convergence.csv"), data).expect("Impossible to write to file!");
